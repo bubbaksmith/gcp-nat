@@ -1,11 +1,10 @@
-resource "google_service_account" "dev_sa" {
-  account_id   = "nat-dev-sa"
-  display_name = "Custom SA for VM Instance"
-  project      = "nat-dev-1"
+resource "google_service_account" "instance_sa" {
+  account_id = "instance-sa"
+  project    = "nat-dev-1"
 }
 
-resource "google_compute_instance" "nat-test" {
-  name         = "nat-test"
+resource "google_compute_instance" "instance1" {
+  name         = "instance1"
   machine_type = "e2-micro"
   zone         = "us-central1-a"
   project      = "nat-dev-1"
@@ -22,14 +21,14 @@ resource "google_compute_instance" "nat-test" {
   }
 
   service_account {
-    email  = google_service_account.dev_sa.email
+    email  = google_service_account.instance_sa.email
     scopes = ["cloud-platform"]
   }
 
-  tags = ["iap-access"]
+  tags = ["iap-access", "nat-gateway"]
 
   depends_on = [
     resource.google_compute_subnetwork.subnet1,
-    resource.google_service_account.dev_sa
+    resource.google_service_account.instance_sa
   ]
 }

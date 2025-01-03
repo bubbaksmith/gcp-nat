@@ -1,9 +1,5 @@
 TERRAFORM_DIR := terraform
 
-init:
-	@echo "Initializing Terraform..."
-	cd $(TERRAFORM_DIR) && terraform init
-
 up: init
 	@echo "Applying Terraform configuration..."
 	cd $(TERRAFORM_DIR) && terraform apply -auto-approve
@@ -11,6 +7,18 @@ up: init
 down: init
 	@echo "Destroying all Terraform resources..."
 	cd $(TERRAFORM_DIR) && terraform destroy -auto-approve
+
+ssh:
+	@echo "Connecting via gcloud compute ssh..."
+	gcloud compute ssh --zone "us-central1-a" "instance1" --tunnel-through-iap --project "nat-dev-1"
+
+ssh-nat:
+	@echo "Connecting to nat via gcloud compute ssh..."
+	gcloud compute ssh --zone "us-central1-a" "nat1" --tunnel-through-iap --project "nat-dev-1"
+
+init:
+	@echo "Initializing Terraform..."
+	cd $(TERRAFORM_DIR) && terraform init
 
 plan: init
 	@echo "Showing Terraform plan..."
@@ -20,13 +28,5 @@ fmt:
 	@echo "Formatting Terraform configuration..."
 	cd $(TERRAFORM_DIR) && terraform fmt -recursive
 
-validate:
-	@echo "Validating Terraform configuration..."
-	cd $(TERRAFORM_DIR) && terraform validate
-
-clean:
-	@echo "Cleaning up Terraform state files..."
-	rm -rf $(TERRAFORM_DIR)/.terraform $(TERRAFORM_DIR)/.terraform.lock.hcl
-
-.PHONY: init up down plan fmt validate clean
+.PHONY: *
 
